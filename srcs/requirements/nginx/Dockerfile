@@ -21,4 +21,4 @@ COPY conf/nginx.conf /etc/nginx/sites-available/default
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
-# ENTRYPOINT ["tail", "-f", "/dev/null"]
+

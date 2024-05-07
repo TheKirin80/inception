@@ -1,25 +1,24 @@
 FROM debian:bullseye
 
+WORKDIR /var/www/wordpress/
+
 RUN	apt update -y && \
 	apt upgrade -y && \
-	apt install -y wget && \
-    apt install -y php7.3 
-	mkdir /etc/nginx/certificates && \
-	mkdir /var/www/wordpress && \
-	openssl req \
-		-x509 \
-		-newkey rsa:2048 \
-		-keyout /etc/nginx/certificates/akefeder-key.pem \
-		-out /etc/nginx/certificates/akefeder.pem \
-		-days 365 \
-		-nodes \
-		-subj '/C=FR/ST=IDF/L=Paris/O=42/OU=42Paris/CN=akefeder.42.fr/UID=akefeder'
+    ##### Install PHP #####
+	apt install -y wget gnupg2 lsb-release && \
+    wget https://packages.sury.org/php/apt.gpg && \
+    apt-key add apt.gpg && \
+    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && \
+    apt update -y && apt install -y php8.1 php8.1-fpm php8.1-mysql && \
+	#####    END      #####
+    apt install -y mariadb-client
 
-EXPOSE 443
+RUN	wget --output-document=/usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x /usr/local/bin/wp && \
+    mkdir -p /var/www/wordpress && \
+    chown www-data:www-data /var/www/wordpress && \
+    wp core download --allow-root
+    
 
-RUN rm /etc/nginx/sites-enabled/default
-COPY conf/nginx.conf /etc/nginx/sites-available/default
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
-# ENTRYPOINT ["tail", "-f", "/dev/null"]
+
