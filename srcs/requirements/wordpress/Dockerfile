@@ -17,8 +17,11 @@ RUN	wget --output-document=/usr/local/bin/wp https://raw.githubusercontent.com/w
     chmod +x /usr/local/bin/wp && \
     mkdir -p /var/www/wordpress && \
     chown www-data:www-data /var/www/wordpress && \
-    wp core download --allow-root
-    
+    #wp core download --allow-root
+
+EXPOSE 9000
+
+ENTRYPOINT ["/init-wp.sh"]
 
 
 
